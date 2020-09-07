@@ -1,0 +1,4 @@
+{
+    "key": "abc123token",
+    "user_agent": "{{ cookiecutter.project_name }} <your-email@domain.com>"
+}

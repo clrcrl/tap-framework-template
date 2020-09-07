@@ -1,0 +1,8 @@
+*.json
+!*/schemas/*.json
+*.sublime-*
+.python-version
+singer-check-tap-data
+*.pyc
+*.egg-info
+dist/
