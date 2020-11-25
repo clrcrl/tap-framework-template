@@ -1,6 +1,6 @@
 {
   "data_source": "e.g. Ticket Tailor",
-  "project_name": "tap-{{ cookiecutter.data_source.replace(' ', '_').lower() }}",
+  "project_name": "tap-{{ cookiecutter.data_source.replace(' ', '-').lower() }}",
   "package_name": "{{ cookiecutter.project_name.replace('-', '_') }}",
   "python_class_prefix": "{{ cookiecutter.data_source.title().replace(' ', '') }}",
   "api_base_url": "e.g. https://api.tickettailor.com/v1/",

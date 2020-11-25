@@ -14,7 +14,7 @@ for endpoint in endpoints:
     f = open("{{cookiecutter.package_name}}/streams/{}.py".format(endpoint), "x")
     f.write(
         """
-from tap_tickettailor.streams.base import BaseStream
+from {{cookiecutter.package_name}}.streams.base import BaseStream
 import singer
 
 LOGGER = singer.get_logger()
@@ -22,7 +22,7 @@ LOGGER = singer.get_logger()
 
 class {0}Stream(BaseStream):
     API_METHOD = "GET"
-    TABLE = "{0}"
+    TABLE = "{1}"
     KEY_PROPERTIES = ["id"]
 
     def response_key(self):
@@ -30,8 +30,9 @@ class {0}Stream(BaseStream):
 
     @property
     def path(self):
-        return "/{0}"
+        return "/{1}"
     """.format(
+            ''.join(x.capitalize() or '_' for x in endpoint.split('_')),
             endpoint
         )
     )
