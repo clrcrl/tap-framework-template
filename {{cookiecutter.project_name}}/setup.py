@@ -11,7 +11,9 @@ setup(
     url="http://fishtownanalytics.com",
     classifiers=["Programming Language :: Python :: 3 :: Only"],
     py_modules=["{{ cookiecutter.package_name }}"],
-    install_requires=["tap-framework==0.0.4",],
+    install_requires=[
+        "tap-framework==0.0.4",
+    ],
     entry_points="""
           [console_scripts]
           {{ cookiecutter.project_name }}={{ cookiecutter.package_name }}:main

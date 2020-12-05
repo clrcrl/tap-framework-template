@@ -32,7 +32,6 @@ class {0}Stream(BaseStream):
     def path(self):
         return "/{1}"
     """.format(
-            ''.join(x.capitalize() or '_' for x in endpoint.split('_')),
-            endpoint
+            "".join(x.capitalize() or "_" for x in endpoint.split("_")), endpoint
         )
     )

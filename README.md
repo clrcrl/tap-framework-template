@@ -1,6 +1,6 @@
-# [WIP] tap-framework Template
+# tap-framework Template
 
-This [cookiecutter](https://github.com/cookiecutter/cookiecutter) template is used in conjunction with [tap-framework](https://github.com/fishtown-analytics/tap-framework) to rapidly prototype Singer taps that use REST APIs.
+This [cookiecutter](https://github.com/cookiecutter/cookiecutter) template is used in conjunction with [tap-framework](https://github.com/fishtown-analytics/tap-framework) to rapidly prototype Singer taps that use (sensible) REST APIs.
 
 Now, I know what you're thinking, a template on top of a framework on top of a spec? That's too many layers of abstraction! And honestly, I couldn't agree more! However, after having built two taps and fussing around with a lot of copy/paste, I decided to go ahead with this.
 
@@ -13,19 +13,25 @@ These instructions assume you know a little bit about python — if something is
 For example:
 - Read the API docs to understand the main endpoints
 - Generate credentials
-- Use [Postman](https://www.postman.com/) or a similar tool to send a successful request using those credentials — this helps you understand how to work with the API
+- Use [Postman](https://www.postman.com/) or a similar tool to send a successful request using those credentials — this helps you understand how to work with the API. It's also worth learning:
+    - How to get to the second page of results
+    - How to change the number of items per request (and what the limit is)
 
-#### 2. Create a new python virtual environment
-Name it something like `tap-<my-tap>-dev` (replacing `<my-tap>` with the name of your tap).
+#### 2. Create a new python virtual environment for cookiecutter
+Name it cookiecutter and then `pip install cookiecutter`.
+
+Activate the virtual environment.
 
 
-#### 3. Create a new tap template
+#### 3. Create a new tap template and `cd` into it
 
-From within the virtualenv:
+From within the `cookicutter` virtualenv:
   - `pip install cookiecutter`
   - `cookiecutter gh:clrcrl/tap-framework-template`
 
 A series of prompts will ask you for some details about your project. Values within `[]`s indicate the default — hit `return` to use that value.
+
+A new directory should be created named `tap-<my-tap>` — `cd` into it.
 
 Here's an example for [Ticket Tailor](https://developers.tickettailor.com/#ticket-tailor-api)
 ```bash
@@ -54,12 +60,14 @@ author_name [e.g. Alice Smith]: Claire Carroll
 author_email [e.g. alice@gmail.com]: claire@clrcrl.com
 ```
 
-Now, you should have a pre-filled template in your directory.
+#### 4. Create another virtual environment for your tap
 
-#### 4. Install the template as a command line utility
+Name it `tap-<my-tap>-dev` and activate it (or set it as the default virtualenv when working in the `tap-<my-tap>` directory).
+
+Install the template as a command line utility
 `pip install -e .`
 
-Check this works by running: `tap-<my-tap> --help`:
+Check the installation has worked by running: `tap-<my-tap> --help`:
 ```
 $ tap-ticket-tailor --help
 usage: tap-ticket-tailor [-h] -c CONFIG [-s STATE] [-p PROPERTIES]
@@ -79,18 +87,19 @@ optional arguments:
 ```
 
 
-#### 5. Update the tap template for your use case, in particular:
+#### 5. Update authorization keys
+(This depends on the API that you're working with)
 
-The template can only take you so far.
+- Check the `config.json.example` file, and update it for the authentication key names needed for this API (don't put your own credentials in — this file just helps other developers)
+- Create your own `config.json` and populate it with your credentials
+- Update the required keys in `tap_<my_tap>/__init__.py`:
 
-**Authorization**:
-Check the `config.json.example` file, and update it for the authentication key names needed for this API (don't put your own credentials in — this file just helps other developers)
+```py
+args = singer.utils.parse_args(required_config_keys=["token"])
+```
 
-Then, you'll likely need to implement your own version of the `make_request` method that is part of tap-framework. To do this:
-1. View the code in [tap-framework](https://github.com/fishtown-analytics/tap-framework/blob/master/tap_framework/client.py#L16)
-2. Copy it into _your_ `<MyTap>Client` and adjust the code based on the API that you're using
+#### 6. Populate endpoint schemas
 
-**Endpoint schemas**:
 Populate each `schemas/<endpoint>.json` file with a jsonschema. Some APIs are kind, and make the jsonschema available (also worth checking the Dev Console in chrome to see if there's a request to get this file). If not, you can either:
 - Manually write it from the API docs
 - Use the [`singer-infer schema` helper tool](https://github.com/singer-io/singer-tools#singer-infer-schema) to infer the schema
@@ -98,11 +107,35 @@ Populate each `schemas/<endpoint>.json` file with a jsonschema. Some APIs are ki
 If you're unfamiliar with jsonschemas, check out some [existing](https://github.com/fishtown-analytics/tap-orbit/tree/master/tap_tickettalor/schemas) [taps](https://github.com/fishtown-analytics/tap-orbit/tree/master/tap_orbit/schemas).
 
 
-**Pagination logic:**
-TODO (But check you're probably going to be working in `streams/base.py` to implement pagination logic)
+#### 7. Generate catalog.json
+As per your tap's README, run the following:
+```
+{{ cookiecutter.project_name }} -c config.json --discover | jq '.streams[].metadata[0].metadata.selected = true' > catalog.json
+```
 
-#### 6. Attempt to run the tap
-At this point, use the tap's README to try to follow the instructions on how to use the tap
+Or simply:
+```
+make discover_and_select
+```
+Just for fun, try to use this generated catalog to see if the tap works:
+```
+{{ cookiecutter.project_name }} -c config.json --catalog catalog.json
+```
+You'll likely hit an error since we haven't adjusted the tap for your API
 
-#### 7. Make the tap incremental
+#### 8. Implement API-specific request logic
+Every API has a different way of sending a request — to handle this, you'll be writing code in `client.py` — there's scaffold code to be edited there. Things to be mindful of:
+- How does authorization happen?
+- How many items do you want to fetch at a time, and how is that specified?
+- What other headers need to be sent through?
+
+This is where having successful Postman requests comes in handy!
+
+#### 9. Implement endpoint logic
+Head over to `streams/base.py` and start to adjust to account for pagination logic. Iteratively attempt to run your tap, and debug.
+
+By the end of this step, you should be getting successful runs of your tap
+
+
+#### 10. Make the tap incremental
 Left as an exercise for the reader

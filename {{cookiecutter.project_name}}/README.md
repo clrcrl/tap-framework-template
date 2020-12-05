@@ -23,7 +23,7 @@ pip install -e .
 
 2. Get an API key from {{ cookiecutter.data_source }}
 <!---
-To-do: include a helpful URL
+TODO: include a helpful URL
 --->
 
 
@@ -34,8 +34,14 @@ There is a template you can use at `config.json.example`, just copy it to `confi
 4. Run the application to generate a catalog.
 
 ```bash
-{{ cookiecutter.project_name }} -c config.json --discover > catalog.json
+$ {{ cookiecutter.project_name }} -c config.json --discover > catalog.json
 ```
+
+Note: if you want to automatically select all fields, run:
+```
+$ {{ cookiecutter.project_name }} -c config.json --discover | jq '.streams[].metadata[0].metadata.selected = true' > catalog.json
+```
+(Check out the included Makefile for shortcuts)
 
 5. Select the tables you'd like to replicate
 

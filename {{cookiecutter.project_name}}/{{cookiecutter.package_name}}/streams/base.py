@@ -16,14 +16,18 @@ class BaseStream(base):
     CACHE = False
     BASE_URL = "{{ cookiecutter.api_base_url }}"
 
-    def get_params(self):
-        params = {"limit": 100}
 
-    def sync_paginated(self, base_url, cursor, params):
+    def get_params(self):
+        # TODO: Update this based on your API
+        params = {}
+        return params
+
+    def sync_paginated(self, params):
         table = self.TABLE
 
         while True:
-            response = self.client.make_request(base_url + cursor, "get", params=params)
+            response = self.client.make_request(
+                url, self.API_METHOD, params=params)
             transformed = self.get_stream_data(response)
 
             with singer.metrics.record_counter(endpoint=table) as counter:
@@ -33,19 +37,21 @@ class BaseStream(base):
             if self.CACHE:
                 stream_cache[table].extend(transformed)
 
-            meta = response.get("links", {})
-            next_cursor = meta.get("next", "")
+            # TODO: Update pagination logic
+            meta = response.get("meta", {})
+            next_page = meta.get("next", "")
 
-            if next_cursor:
-                cursor = next_cursor
+            if next_page:
+                params['cursor'] = next_cursor
             else:
                 break
 
     def sync_data(self):
         table = self.TABLE
         LOGGER.info("Syncing data for {}".format(table))
+        url = self.BASE_URL + self.PATH
         params = self.get_params()
-        self.sync_paginated(self.BASE_URL, self.path, params)
+        self.sync_paginated(url, params)
 
         return self.state
 
