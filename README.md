@@ -102,7 +102,7 @@ args = singer.utils.parse_args(required_config_keys=["token"])
 
 Populate each `schemas/<endpoint>.json` file with a jsonschema. Some APIs are kind, and make the jsonschema available (also worth checking the Dev Console in chrome to see if there's a request to get this file). If not, you can either:
 - Manually write it from the API docs
-- Use the [`singer-infer schema` helper tool](https://github.com/singer-io/singer-tools#singer-infer-schema) to infer the schema
+- Use this [online tool to infer schemas](https://jsonschema.net/home).
 
 If you're unfamiliar with jsonschemas, check out some [existing](https://github.com/fishtown-analytics/tap-orbit/tree/master/tap_tickettalor/schemas) [taps](https://github.com/fishtown-analytics/tap-orbit/tree/master/tap_orbit/schemas).
 
