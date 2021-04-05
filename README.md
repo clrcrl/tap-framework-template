@@ -1,4 +1,5 @@
 # tap-framework Template
+> ⚠️ This repo was an experiment. Now that the [Singer SDK](https://gitlab.com/meltano/singer-sdk) exists, I encourage you to use that instead! I personally will be
 
 This [cookiecutter](https://github.com/cookiecutter/cookiecutter) template is used in conjunction with [tap-framework](https://github.com/fishtown-analytics/tap-framework) to rapidly prototype Singer taps that use (sensible) REST APIs.
 
